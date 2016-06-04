@@ -18,6 +18,7 @@
   "author": "Andrew Hurst",
   "license": "MIT",
   "dependencies": {
+    "async": "^2.0.0-rc.5",
     "jsonwebtoken": "^7.0.0",
     "lodash": "4.13.1"
   },
