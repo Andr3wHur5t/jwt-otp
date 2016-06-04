@@ -1,25 +1,25 @@
 'use strict';
-const _ = require("lodash");
-const async = require("async")
-const jwt = require('jsonwebtoken');
-const crypto =  require("crypto");
+var _ = require("lodash");
+var async = require("async")
+var jwt = require('jsonwebtoken');
+var crypto =  require("crypto");
 
-const OTP_ALGORITHMS = {
-    sha1: "sha1",
+var OTP_ALGORITHMS = {
+    SHA1: "sha1",
     SHA2: "sha256",
-    md5: "md5",
-    rmd160: "rmd160"
+    MD5: "md5",
+    RMD160: "rmd160"
 };
-const SUPPORTED_OTP = _.values(OTP_ALGORITHMS);
+var SUPPORTED_OTP = _.values(OTP_ALGORITHMS);
 
-const JWT_ALGORITHMS = {
+var JWT_ALGORITHMS = {
     HS256: "HS256",
     HS384: "HS384",
     HS512: "HS512"
 };
-const SUPPORTED_JWT = _.values(JWT_ALGORITHMS);
+var SUPPORTED_JWT = _.values(JWT_ALGORITHMS);
 
-const DEFAULT_SEED_CONFIG = {
+var DEFAULT_SEED_CONFIG = {
     otpAlgo: OTP_ALGORITHMS.SHA2,
     jwtAlgo: JWT_ALGORITHMS.HS256
 };
@@ -117,7 +117,7 @@ TokenAgent.prototype.issueToken = function issueToken (payload, options, done) {
  *
  * @param token The signed JWT you wish to read and verify.
  * @param [options] To be used by the JWT lib.
- * @param [done] The optional callback. This function will return sync if no done is provided.
+ * @param done Returns the result or error.
  */
 TokenAgent.prototype.validateToken = function issueToken (token, options, done) {
     // Get the timestamp from the unverified token
@@ -146,10 +146,7 @@ TokenAgent.prototype.validateToken = function issueToken (token, options, done) 
     );
 };
 
-/**
- * This does not provide additional protection, Adding to discourage bad usage.
- * @returns {string}
- */
+// Doesn't help security, but dose discourage bad use.
 TokenAgent.prototype.toString = function () { return JSON.stringify(this); };
 TokenAgent.prototype.toJSON = function () { return { "class": "TokenAgent ", information: "Redacted" }; };
 
