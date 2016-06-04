@@ -4,7 +4,7 @@
   "description": "Plug and play javascript web tokens using managed secrets and per token OTP.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec tests"
+    "test": "mocha --reporter spec tests.js"
   },
   "keywords": [
     "JWT",
