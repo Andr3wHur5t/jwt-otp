@@ -1,6 +1,6 @@
 'use strict';
 var _ = require("lodash");
-var async = require("async")
+var async = require("async");
 var jwt = require('jsonwebtoken');
 var crypto =  require("crypto");
 
@@ -50,7 +50,7 @@ TokenAgent.prototype.OTP_ALGORITHMS = OTP_ALGORITHMS;
 TokenAgent.prototype.JWT_ALGORITHMS = JWT_ALGORITHMS;
 
 function prepareSeed(secret, options) {
-    options = _.defaults({secret: secret}, (options || {}), DEFAULT_SEED_CONFIG);
+    options = _.defaults({secret: secret}, (options || {}), _.clone(DEFAULT_SEED_CONFIG));
     if (!_.includes(SUPPORTED_OTP, options.otpAlgo))
         throw new Error(options.otpAlgo + " isn't a supported OTP algorithm. " + JSON.stringify(SUPPORTED_OTP));
     if (!_.includes(SUPPORTED_JWT, options.jwtAlgo))
@@ -74,6 +74,14 @@ TokenAgent.prototype.addValidationSecret = function setIssuingSeed (secret, opti
     this.validSeeds[seed.jwtAlgo].push(seed);
 };
 
+TokenAgent.prototype.seedsForAlgo = function (algo) {
+    var seeds = _.clone(this.validSeeds[algo]) || [];
+    if (this.issuingSeed && this.issuingSeed.jwtAlgo === algo)
+        seeds.push(this.issuingSeed);
+    // todo: let keys expire
+    return seeds
+};
+
 /**
  * Generates an OTP using the given seed configuration and a timestamp.
  *
@@ -94,7 +102,9 @@ TokenAgent.prototype.generateOTP = function validOTP (seed, timestamp) {
  * @param timestamp The timestamp to generate the OTP for.
  */
 TokenAgent.prototype.validOTPs = function validOTP (algo, timestamp) {
-
+    return this.seedsForAlgo(algo).map((function (seed) {
+        return this.generateOTP(seed, timestamp);
+    }).bind(this));
 };
 
 /***
@@ -120,12 +130,14 @@ TokenAgent.prototype.issueToken = function issueToken (payload, options, done) {
  * @param done Returns the result or error.
  */
 TokenAgent.prototype.validateToken = function issueToken (token, options, done) {
-    // Get the timestamp from the unverified token
-    var unverifiedPayload = jwt.read(token);
-    var usedAlgorithm = ""; // TODO: Get the algoritm header
-    var validSecrets = this.validOTPs(usedAlgorithm, unverifiedPayload.otp);
+    if(typeof options === "function") {
+        done = options;
+        options = {};
+    }
 
-    options = _.defaults({algorithms: [usedAlgorithm]}, options, this.jwtOptions);
+    // Get the timestamp and algorithm from the unverified token
+    var unverified = jwt.decode(token, {complete: true});
+    options = _.defaults({algorithms: [unverified.header.alg]}, options, this.jwtOptions);
 
     var attemptValidation = function (secret, done) {
         jwt.verify(token, secret, options, function (err, payload) {
@@ -134,14 +146,13 @@ TokenAgent.prototype.validateToken = function issueToken (token, options, done) 
         })
     };
 
-    async.each(
-        validSecrets,
+    async.map(
+        this.validOTPs(unverified.header.alg, unverified.payload.otp),
         attemptValidation,
         function findResult (err, results) {
-            results = _.remove(results, [undefined]);
-            // TODO: Re
-            console.log(results);
-            return done(null, results);
+            results = _.remove(results, undefined);
+            if (results.length == 0) return done(new Error("Token was invalid."));
+            return done(null, _.first(results));
         }
     );
 };

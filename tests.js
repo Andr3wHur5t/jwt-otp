@@ -17,9 +17,10 @@ describe("jwt-otp tokenAgent", function (){
             agent.addValidationSecret("my_voice_is_my_password");
 
             timekeeper.travel(new Date("10-26-2016"));
+            expiresAtTime = new Date().getTime()
             agent.addValidationSecret("my_voice_isnt_my_password", {
-                otpAlgo: agent.OTP_ALGORITHMS.md5,
-                expiresAt: new Date().getTime()
+                otpAlgo: agent.OTP_ALGORITHMS.MD5,
+                expiresAt: expiresAtTime
             });
             assert.deepEqual(
                 agent.validSeeds,
@@ -35,7 +36,7 @@ describe("jwt-otp tokenAgent", function (){
                             secret: 'my_voice_isnt_my_password',
                             otpAlgo: 'md5',
                             jwtAlgo: 'HS256',
-                            expiresAt: 1477465200000
+                            expiresAt: expiresAtTime
                         }
                     ]
                 }
@@ -84,12 +85,22 @@ describe("jwt-otp tokenAgent", function (){
             var agent = new TokenAgent();
             agent.setIssuingSecret("my_voice_is_my_password");
             timekeeper.travel(new Date("10-26-2016"));
-            assert.equal(agent.issueToken({iLike: "cake"}),
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpTGlrZSI6ImNha2UiLCJvdHAiOjE0Nzc0NjUyMDAwMDAsImlhdCI6MTQ3NzQ2NTIwMH0.suSiapybRNaV7jUZhRbz3a76_6ODQrAi4kKvTlQzqCY")
+            // Because of race conditions of OTP it can be either
+            var applicable = [
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpTGlrZSI6ImNha2UiLCJvdHAiOjE0Nzc0NjUyMDAwMDAsImlhdCI6MTQ3NzQ2NTIwMH0.suSiapybRNaV7jUZhRbz3a76_6ODQrAi4kKvTlQzqCY",
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpTGlrZSI6ImNha2UiLCJvdHAiOjE0Nzc0NjUyMDAwMDAsImlhdCI6MTQ3NzQ2NTIwMH0.suSiapybRNaV7jUZhRbz3a76_6ODQrAi4kKvTlQzqCY"
+            ];
+            assert(_.includes(applicable, agent.issueToken({iLike: "cake"})))
         });
 
-        it("should issue a validatable token", function () {
-
+        it("should issue a validatable token", function (done) {
+            var agent = new TokenAgent();
+            agent.setIssuingSecret("my_voice_is_my_password");
+            var token = agent.issueToken({iLike: "cake"})
+            agent.validateToken(token, function (err, payload) {
+                assert.equal(payload.iLike, "cake");
+                return done(err);
+            });
         });
     });
 
