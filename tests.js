@@ -90,7 +90,8 @@ describe("jwt-otp tokenAgent", function (){
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpTGlrZSI6ImNha2UiLCJvdHAiOjE0Nzc0NjUyMDAwMDAsImlhdCI6MTQ3NzQ2NTIwMH0.suSiapybRNaV7jUZhRbz3a76_6ODQrAi4kKvTlQzqCY",
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpTGlrZSI6ImNha2UiLCJvdHAiOjE0Nzc0NjUyMDAwMDAsImlhdCI6MTQ3NzQ2NTIwMH0.suSiapybRNaV7jUZhRbz3a76_6ODQrAi4kKvTlQzqCY"
             ];
-            assert(_.includes(applicable, agent.issueToken({iLike: "cake"})))
+            var token = agent.issueToken({iLike: "cake"});
+            assert(_.includes(applicable, token), token)
         });
 
         it("should issue a validatable token", function (done) {
