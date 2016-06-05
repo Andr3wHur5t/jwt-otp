@@ -88,7 +88,8 @@ describe("jwt-otp tokenAgent", function (){
             // Because of race conditions of OTP it can be either
             var applicable = [
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpTGlrZSI6ImNha2UiLCJvdHAiOjE0Nzc0NjUyMDAwMDAsImlhdCI6MTQ3NzQ2NTIwMH0.suSiapybRNaV7jUZhRbz3a76_6ODQrAi4kKvTlQzqCY",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpTGlrZSI6ImNha2UiLCJvdHAiOjE0Nzc0NjUyMDAwMDAsImlhdCI6MTQ3NzQ2NTIwMH0.suSiapybRNaV7jUZhRbz3a76_6ODQrAi4kKvTlQzqCY"
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpTGlrZSI6ImNha2UiLCJvdHAiOjE0Nzc0NjUyMDAwMDAsImlhdCI6MTQ3NzQ2NTIwMH0.suSiapybRNaV7jUZhRbz3a76_6ODQrAi4kKvTlQzqCY",
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpTGlrZSI6ImNha2UiLCJvdHAiOjE0Nzc0NDAwMDAwMDAsImlhdCI6MTQ3NzQ0MDAwMH0.FwBTJcvQGNypp3vMViWIHzqbI3x8jPtEc6nMvQe28gQ"
             ];
             var token = agent.issueToken({iLike: "cake"});
             assert(_.includes(applicable, token), token)
