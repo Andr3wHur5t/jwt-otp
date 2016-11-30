@@ -32,5 +32,9 @@
   "devDependencies": {
     "mocha": "2.5.3",
     "timekeeper": "0.1.1"
+  }, 
+  "repository": { 
+    "type": "git",
+    "url": "https://github.com/Andr3wHur5t/jwt-otp.git"
   }
 }
