@@ -1,5 +1,7 @@
 # JWT-OTP
 
+[![CircleCI](https://circleci.com/gh/Andr3wHur5t/jwt-otp.svg?style=svg)](https://circleci.com/gh/Andr3wHur5t/jwt-otp)
+
 Simple Javascript Web Tokens using OTPs for signatures.
 
 ## Getting Started
